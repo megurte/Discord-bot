@@ -4,71 +4,67 @@ from discord import utils
 import config
  
 class MyClient(discord.Client):
-    async def on_ready(self):
-        print('Logged on as {0}!'.format(self.user))
- 
+	
+	async def on_ready(self):
+		print('Logged on as {0}!'.format(self.user))
+		
 
-    async def on_init(self):
-    	if ':croissant:' in message.content:
-        	emoji = get(self.user.get_all_emojis(), name=':croissant:')
-        	await self.user.add_reaction(message, emoji)
-
+	async def function(self, payload):
+		await message.remove_reaction(payload.emoji, self)
 
  	#add new role
-    async def on_raw_reaction_add(self, payload):
-        if payload.message_id == POST_ID:
-            channel = self.get_channel(payload.channel_id) # получаем объект канала
-            message = await channel.fetch_message(payload.message_id) # получаем объект сообщения
-            member = utils.get(message.guild.members, id=payload.user_id) # получаем объект пользователя который поставил реакцию
+	async def on_raw_reaction_add(self, payload):
+		if payload.message_id == POST_ID:
+			channel = self.get_channel(payload.channel_id) # получаем объект канала
+			message = await channel.fetch_message(payload.message_id) # получаем объект сообщения
+			member = utils.get(message.guild.members, id=payload.user_id) # получаем объект пользователя который поставил реакцию
  
-        try:
-            emoji = str(payload.emoji) # эмоджик который выбрал юзер
-            role = utils.get(message.guild.roles, id=ROLES[emoji]) # объект выбранной роли (если есть)
-            
-            if(len([i for i in member.roles if i.id not in EXCROLES]) <= MAX_ROLES_PER_USER):
-                await member.add_roles(role)
-                print('[SUCCESS] User {0.display_name} has been granted with role {1.name}'.format(member, role))
-            else:
-                await message.remove_reaction(payload.emoji, member)
-                print('[ERROR] Too many roles for user {0.display_name}'.format(member))
-            
-        except KeyError as e:
-            print('[ERROR] KeyError, no role found for ' + emoji)
-        except Exception as e:
-            print(repr(e))
+		try:
+			emoji = str(payload.emoji) # эмоджик который выбрал юзер
+			role = utils.get(message.guild.roles, id=ROLES[emoji]) # объект выбранной роли (если есть)
+
+			await member.add_roles(role)
+			print('[SUCCESS] User {0.display_name} has been granted with role {1.name}'.format(member, role))
+			#else:
+			#	await message.remove_reaction(payload.emoji, member)
+			#	print('[ERROR] Too many roles for user {0.display_name}'.format(member))
+
+		except KeyError as e:
+			print('[ERROR] KeyError, no role found for ' + emoji)
+		except Exception as e:
+			print(repr(e))
   	
   	#remove role
-    async def on_raw_reaction_remove(self, payload):
-        if payload.message_id == POST_ID:
-        	channel = self.get_channel(payload.channel_id) # получаем объект канала
-        	message = await channel.fetch_message(payload.message_id) # получаем объект сообщения
-        	member = utils.get(message.guild.members, id=payload.user_id) # получаем объект пользователя который поставил реакцию
- 
-        try:
-            emoji = str(payload.emoji) # эмоджик который выбрал юзер
-            role = utils.get(message.guild.roles, id=ROLES[emoji]) # объект выбранной роли (если есть)
- 
-            await member.remove_roles(role)
-            print('[SUCCESS] Role {1.name} has been remove for user {0.display_name}'.format(member, role))
- 
-        except KeyError as e:
-            print('[ERROR] KeyError, no role found for ' + emoji)
-        except Exception as e:
-            print(repr(e))
- 
+	async def on_raw_reaction_remove(self, payload):
+		if payload.message_id == POST_ID:
+			channel = self.get_channel(payload.channel_id) # получаем объект канала
+			message = await channel.fetch_message(payload.message_id) # получаем объект сообщения
+			member = utils.get(message.guild.members, id=payload.user_id) # получаем объект пользователя который поставил реакцию
 
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
+		try:
+			emoji = str(payload.emoji) # эмоджик который выбрал юзер
+			role = utils.get(message.guild.roles, id=ROLES[emoji]) # объект выбранной роли (если есть)
 
-        if message.content == 'Что ты умеешь?':
-            await message.channel.send('Я пока ничего не умею')
+			await member.remove_roles(role)
+			print('[SUCCESS] Role {1.name} has been remove for user {0.display_name}'.format(member, role))
+ 
+		except KeyError as e:
+			print('[ERROR] KeyError, no role found for ' + emoji)
+		except Exception as e:
+			print(repr(e))
+ 
+	async def on_message(self, message):
+		if message.author == self.user:
+			return
 
-        if message.content == 'Значит я тебя улучшу':
-            await message.channel.send('Спасибо, создатель!')
+		if message.content == 'Что ты умеешь?':
+			await message.channel.send('Я пока ничего не умею')
 
-        if message.content == 'test':
-            await message.channel.send('test reply')
+		if message.content == 'Значит я тебя улучшу':
+			await message.channel.send('Спасибо, создатель!')
+
+		if message.content == 'test':
+			await message.channel.send('test reply')
 
 
 
