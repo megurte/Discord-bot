@@ -7,6 +7,14 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
  
+
+    async def on_init(self):
+    	if ':croissant:' in message.content:
+        	emoji = get(self.user.get_all_emojis(), name=':croissant:')
+        	await self.user.add_reaction(message, emoji)
+
+
+ 	#add new role
     async def on_raw_reaction_add(self, payload):
         if payload.message_id == POST_ID:
             channel = self.get_channel(payload.channel_id) # получаем объект канала
@@ -28,7 +36,8 @@ class MyClient(discord.Client):
             print('[ERROR] KeyError, no role found for ' + emoji)
         except Exception as e:
             print(repr(e))
- 
+  	
+  	#remove role
     async def on_raw_reaction_remove(self, payload):
         if payload.message_id == POST_ID:
         	channel = self.get_channel(payload.channel_id) # получаем объект канала
@@ -61,6 +70,8 @@ class MyClient(discord.Client):
         if message.content == 'test':
             await message.channel.send('test reply')
 
+
+
 TOKEN = 'Nzc5NDUzOTEyMzE0OTM3Mzg0.X7gxBg.bJgS45rEljUU_GXGXKnjpctoKR8'
 
 POST_ID = 779621202242306058
@@ -68,7 +79,6 @@ POST_ID = 779621202242306058
 ROLES = {
 	'🥐': 276393911771987968, #Чебурек
 	'🚶‍♂️': 276394311136837633, #no-name-role
-	#'😀': 361495636480098306, #naci
 	'🏳️‍🌈': 364081386715480077, #homo
 }
 
