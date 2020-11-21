@@ -8,7 +8,7 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as', self.user)
 
-     async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload):
         if payload.message_id == config.POST_ID:
             channel = self.get_channel(payload.channel_id) 
             message = await channel.fetch_message(payload.message_id) 
@@ -63,4 +63,4 @@ class MyClient(discord.Client):
             await message.channel.send('test reply')
 
 client = MyClient()
-client.run('config.TOKEN')
+client.run('Nzc5NDUzOTEyMzE0OTM3Mzg0.X7gxBg.bJgS45rEljUU_GXGXKnjpctoKR8')
