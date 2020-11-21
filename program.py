@@ -25,4 +25,4 @@ class MyClient(discord.Client):
             await message.channel.send('test reply')
 
 client = MyClient()
-client.run('Nzc5NDUzOTEyMzE0OTM3Mzg0.X7gxBg.bJgS45rEljUU_GXGXKnjpctoKR8')
+client.run('config.TOKEN')
