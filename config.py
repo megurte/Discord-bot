@@ -27,16 +27,7 @@ if message.content == '!join':
 			voice_client = member.message.guild.voice_client
 			print("leave")
 			await voice_client.disconnect()	
-async def on_message(self, message):
-		
-		if message.content == '!hello':
-			responses = ['Привет, создатель!', 'Добро пожаловать', 'こんにちは～～', 'こんばんは、みんなさん', 'おかえりなさいご主人']
-			print("hello")
-			await message.channel.send(choice(responses))
 
-		if message.content == '!ping':		
-			print(f'**Pong!** Latency: {round(client.latency * 1000)}ms')
-			await message.channel.send(f'**Pong!** Latency: {round(client.latency * 1000)}ms')
 
 
 class MyClient(discord.Client):
@@ -71,3 +62,42 @@ class MyClient(discord.Client):
 	async def on_member_join(member):
 		channel = utils.get(member.guild.channels, name='general')
 		await channel.send(f'Welcome {member.mention}!  Ready to jam out? See `?help` command for details!')
+
+
+
+
+
+		
+	client = commands.Bot(command_prefix='!')
+
+	@client.command()
+	async def join(ctx):
+		print("join")
+		global voice
+		channel = ctx.message.author.voice.channel
+		voice = get(client.voice_clients, guild = ctx.guild)
+
+		if voice and voice.is_connected():
+			await voice.move_to(channel)
+		else:
+			voice = await channel.connect()
+			await ctx.send('успешно подключился')
+
+	@client.command()
+	async def leave(ctx):
+		print("leave")
+		global voice
+		channel = ctx.message.author.voice.channel
+		voice = get(client.voice_clients, guild = ctx.guild)
+
+		if voice and voice.is_connected():
+			await voice.disconnect()
+		else:
+			voice = await connect.channel()
+			await ctx.send('успешно отключился')
+	
+
+	@client.command()
+	async def foo(ctx, arg):
+		print("foo")
+		await ctx.send(arg)
