@@ -53,7 +53,7 @@ async def summ(ctx, arg1, arg2):
 
 
 @client.event
-async def on_message( message):
+async def on_message(message):
 		
 	if message.content == 'Бот - молодец':
 			await message.channel.send('Спасибо! ❤️')
