@@ -8,10 +8,6 @@ class MyClient(discord.Client):
 	async def on_ready(self):
 		print('Logged on as {0}!'.format(self.user))
 		
-
-	async def function(self, payload):
-		await message.add_reaction(payload.emoji, self)
-
  	#add new role
 	async def on_raw_reaction_add(self, payload):
 		if payload.message_id == POST_ID:
@@ -63,6 +59,12 @@ class MyClient(discord.Client):
 		if message.content == 'test':
 			await message.channel.send('test reply')
 
+		if message.content == '!help':
+			await message.channel.send('command list')
+
+		if message.content == '!leave':
+			await leave(self)
+
 		if '!bot add emoji' in message.content:
 			print("ok")
 			emoji1 = str('🥐')
@@ -71,6 +73,30 @@ class MyClient(discord.Client):
 			await message.add_reaction(emoji1)
 			await message.add_reaction(emoji2)
 			await message.add_reaction(emoji3)
+
+		if '!play' in message.content: 
+			await music_play()
+
+	async def music_play(self, message, payload):
+		channel = self.get_channel(payload.channel_id)
+		await print(channel)
+		message_author = utils.get(message.author, id=payload.user_id)
+		await print(message_author)
+		if '!play' in message.content: 
+			await print('its on')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
