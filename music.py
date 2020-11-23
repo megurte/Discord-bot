@@ -2,6 +2,9 @@ import discord
 from discord import utils
 
 from discord.ext import commands
+from discord.ext.commands import has_permissions
+from discord.ext.commands import MissingPermissions
+from discord.ext.commands import CheckFailure
 from discord.voice_client import VoiceClient
 
 from random import choice
@@ -34,19 +37,19 @@ async def join(ctx):
 	if not ctx.message.author.voice:
 		await ctx.send("Вы не в войс канале")
 		return
-
 	else:
 		channel = ctx.message.author.voice.channel
-
 	await channel.connect()
+
 
 @client.command(name = 'leave', help = 'Отключить бота из голосового канала')
 async def leave(ctx):
 	voice_client = ctx.message.guild.voice_client
 	await voice_client.disconnect()
 	
-@client.command(name = 'summ', help = 'Сложить два числа X Y')
-async def summ(ctx, arg1, arg2):
+
+@client.command(aliases = ['adder', 'addition', 'summ'],name = 'sum', help = 'Сложить два числа X Y')
+async def _summ(ctx, arg1, arg2):
 	await ctx.send(int(arg1)+int(arg2))
 
 
@@ -63,12 +66,29 @@ async def on_message(message):
 		await message.channel.send(f'Всегда рада помочь!')
 	await client.process_commands(message)
 
-@client.command()
-@commands.has_permissions(administrator = True)
-async def clear(ctx, amount = 5):
-	print('deleted ' + str(amount) + ' message(s)')
-	await ctx.channel.purge(limit=amount)	
 
+@client.command(name='clear')
+@has_permissions(administrator=True)
+async def clear(ctx, amount = 2):
+	if ctx.message.author.guild_permissions.administrator:
+		print('deleted ' + str(amount) + ' message(s)')
+		await ctx.channel.purge(limit=amount)	
+	else:
+		await ctx.send("Извините, вы не можите использовать эту команду. Необходимо иметь права администратора")
+
+
+
+#@clear.error
+#async def clear_error(error, ctx):
+ #   if isinstance(error, CheckFailure):
+ #       await ctx.send("Извините, вы не можите использовать эту команду. Необходимо иметь права администратора")
 
 client.run('Nzc5NDUzOTEyMzE0OTM3Mzg0.X7gxBg.bJgS45rEljUU_GXGXKnjpctoKR8')
+
+
+
+
+
+
+
 
