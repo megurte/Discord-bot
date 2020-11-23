@@ -1,7 +1,9 @@
 import discord
 import youtube_dl
-from discord import utils
 
+from discord import utils
+from discord import FFmpegPCMAudio
+from youtube_dl import YoutubeDL
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 from discord.ext.commands import MissingPermissions
@@ -20,6 +22,39 @@ ROLES = {
 EXCROLES = ()
 
 players = {}
+
+ydl_opts = {
+    'format': 'bestaudio/best',
+  	'outtmpl': 'c:/Songs_download/%(title)s.%(ext)s', # <--- pay attention here
+    'download_archive': 'downloaded_songs.txt',
+    'outtmpl': '%(title)s.%(ext)s',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        #'preferredquality': '192',
+        }],
+    #'logger': MyLogger(),
+    #'progress_hooks': [my_hook],
+
+}
+
+def my_hook(d):
+    if d['status'] == 'finished':
+        file_tuple = os.path.split(os.path.abspath(d['filename']))
+        print("Done downloading {}".format(file_tuple[1]))
+    if d['status'] == 'downloading':
+        print(d['filename'], d['_percent_str'], d['_eta_str'])
+
+class MyLogger(object):
+	def debug(self, msg):
+		pass
+
+	def warning(self, msg):
+		pass
+
+	def error(self, msg):
+		print(msg)
+
 
 @client.event
 async def on_ready():
@@ -57,15 +92,20 @@ async def leave(ctx):
 	await voice_client.disconnect()
 	
 
-@client.command(aliases = ['py', 'playyoutube', 'play_youtube'],name = 'pyou', help = 'Запустить проигрывание ютуб видео')
+@client.command(aliases = ['py', 'playyoutube', 'play_youtube'],name = 'pyou', help = 'Запустить проигрывание ютуб видео по ссылке')
 async def pyou(ctx, url):
-	#guild = ctx.message.guild
-	#voice_client = client.voice_client_in(guild)
-	voice_client = ctx.guild.voice_client
-	player = await voice_client.create_ytdl_player(url)
-	players[server.id] = player
-	player.start()
+	FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+	voice = utils.get(client.voice_clients, guild=ctx.guild)
 
+	if not voice.is_playing():
+		with YoutubeDL(ydl_opts) as ydl:
+			info = ydl.extract_info(url, download=False)
+		URL = info['formats'][0]['url']
+		voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+		voice.is_playing()
+	else:
+		await ctx.send("Already playing song")
+		return
 
 
 @client.command(aliases = ['adder', 'addition', 'summ'],name = 'sum', help = 'Сложить два числа X Y')
@@ -76,7 +116,7 @@ async def _summ(ctx, arg1, arg2):
 
 
 
-@client.command(name='clear')
+@client.command(name='clear', help = 'Удалениет заданное число сообщений')
 @has_permissions(administrator=True)
 async def clear(ctx, amount = 2):
 	if ctx.message.author.guild_permissions.administrator:
