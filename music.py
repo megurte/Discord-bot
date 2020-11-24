@@ -14,6 +14,12 @@ from random import choice
 
 client = commands.Bot(command_prefix='!')
 POST_ID = 779692750941323264
+
+play_emoji =str("▶️")
+pause_emoji= str("⏸️")
+resume_emoji = str("🔃")
+stop_emoji = str("⏹️")
+
 ROLES = {
 	'🥐': 276393911771987968, #Чебурек
 	'🚶‍♂️': 276394311136837633, #no-name-role
@@ -98,6 +104,7 @@ async def leave(ctx):
 async def pyou(ctx, url):
 	FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 	voice = utils.get(client.voice_clients, guild=ctx.guild)
+	#message = await channel.fetch_message(ctx.message_id)
 
 	if not voice.is_playing():
 		with YoutubeDL(ydl_opts) as ydl:
@@ -105,9 +112,11 @@ async def pyou(ctx, url):
 		URL = info['formats'][0]['url']
 		voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
 		voice.is_playing()
+		await ctx.message.add_reaction(play_emoji)
 	else:
 		await ctx.send("Already playing song")
 		return
+
 
 #youtube music pause
 @client.command()
@@ -116,7 +125,8 @@ async def pausey(ctx):
 	if voice and voice.is_playing():
 		print("Bot is playing")
 		voice.pause()
-		await ctx.send("⏸️")
+		#await ctx.send("⏸️")
+		await ctx.message.add_reaction(pause_emoji)
 	else:
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
@@ -127,10 +137,24 @@ async def resumey(ctx):
 	if voice and voice.is_paused():
 		print("Resume music")
 		voice.resume()
-		await ctx.send("🔃")
+		await ctx.message.add_reaction(resume_emoji)
+		#await ctx.send("🔃")
 	else:
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
+
+@client.command()
+async def stopy(ctx):
+	voice = utils.get(client.voice_clients,guild=ctx.guild)
+	if voice and voice.is_playing():
+		print("Music stopped")
+		voice.stop()
+		#await ctx.send("⏹️")
+		await ctx.message.add_reaction(stop_emoji)
+	else:
+		print("Nothing is playing")
+		await ctx.send("Ошибка, нет текущей песни")
+
 
 #youtube music skip
 @client.command()
@@ -143,6 +167,8 @@ async def skipy(ctx):
 	else:
 		print("Nothing is playing")
 		await ctx.send("Ошибка, что-то пошло не так")
+
+
 
 
 @client.command(aliases = ['adder', 'addition', 'summ'],name = 'sum, adder, summ', help = 'Сложить два числа X Y')
