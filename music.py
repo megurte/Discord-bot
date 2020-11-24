@@ -59,7 +59,8 @@ class MyLogger(object):
 @client.event
 async def on_ready():
 	await client.change_presence(activity=discord.Game(name="trying to do her best"))
-	print('Logged on as Lulu-support#3215!') 
+	print('Logged on as {0}!'.format(client.user))
+
 
 
 @client.command(name = 'hello', help = 'Поприветствовать бота')
@@ -92,7 +93,8 @@ async def leave(ctx):
 	await voice_client.disconnect()
 	
 
-@client.command(aliases = ['py', 'playyoutube', 'play_youtube'],name = 'pyou', help = 'Запустить проигрывание ютуб видео по ссылке')
+#youtube music commands
+@client.command(aliases = ['pyou', 'py', 'playyoutube'],name = 'pyou, py, playyoutube', help = 'Запустить проигрывание ютуб видео по ссылке')
 async def pyou(ctx, url):
 	FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 	voice = utils.get(client.voice_clients, guild=ctx.guild)
@@ -107,8 +109,43 @@ async def pyou(ctx, url):
 		await ctx.send("Already playing song")
 		return
 
+#youtube music pause
+@client.command()
+async def pausey(ctx):
+	voice = utils.get(client.voice_clients,guild=ctx.guild)
+	if voice and voice.is_playing():
+		print("Bot is playing")
+		voice.pause()
+		await ctx.send("⏸️")
+	else:
+		print("Nothing is playing")
+		await ctx.send("Ошибка, нет текущей песни")
 
-@client.command(aliases = ['adder', 'addition', 'summ'],name = 'sum', help = 'Сложить два числа X Y')
+@client.command()
+async def resumey(ctx):
+	voice = utils.get(client.voice_clients,guild=ctx.guild)
+	if voice and voice.is_paused():
+		print("Resume music")
+		voice.resume()
+		await ctx.send("🔃")
+	else:
+		print("Nothing is playing")
+		await ctx.send("Ошибка, нет текущей песни")
+
+#youtube music skip
+@client.command()
+async def skipy(ctx):
+	voice = utils.get(client.voice_clients,guild=ctx.guild)
+	if voice and voice.is_playing() or voice.is_paused():
+		print("Skip music")
+		#voice.resume
+		await ctx.send("⏭️")
+	else:
+		print("Nothing is playing")
+		await ctx.send("Ошибка, что-то пошло не так")
+
+
+@client.command(aliases = ['adder', 'addition', 'summ'],name = 'sum, adder, summ', help = 'Сложить два числа X Y')
 async def _summ(ctx, arg1, arg2):
 	await ctx.send(int(arg1)+int(arg2))
 
@@ -118,22 +155,21 @@ async def _summ(ctx, arg1, arg2):
 
 @client.command(name='clear', help = 'Удалениет заданное число сообщений')
 @has_permissions(administrator=True)
-async def clear(ctx, amount = 2):
-	if ctx.message.author.guild_permissions.administrator:
-		print('deleted ' + str(amount) + ' message(s)')
-		await ctx.channel.purge(limit=amount)	
-	else:
+async def clear(ctx, amount = 2):	
+	print('deleted ' + str(amount) + ' message(s)')
+	await ctx.channel.purge(limit=amount)	
+	
+
+@clear.error
+async def clear_error(error, ctx):
+	if isinstance(error, MissingPermissions):
+		print("error")
 		await ctx.send("Извините, вы не можите использовать эту команду. Необходимо иметь права администратора")
 
 
-
-
-
-
-
-
-
-
+#if ctx.message.author.server_permissions.administrator:
+#else:
+	#	await ctx.send("Извините, вы не можите использовать эту команду. Необходимо иметь права администратора")
 
 #add role	
 @client.event
