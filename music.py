@@ -114,12 +114,11 @@ async def pyou(ctx, url):
 		voice.is_playing()
 		await ctx.message.add_reaction(play_emoji)
 	else:
-		await ctx.send("Already playing song")
+		await ctx.send("Музыка уже играет")
 		return
 
 
-#youtube music pause
-@client.command()
+@client.command(name = 'pausey', help = 'Остановить проигрывание трека')
 async def pausey(ctx):
 	voice = utils.get(client.voice_clients,guild=ctx.guild)
 	if voice and voice.is_playing():
@@ -131,7 +130,8 @@ async def pausey(ctx):
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
 
-@client.command()
+
+@client.command(name = 'resumey', help = 'Возобновить проигрывание трека')
 async def resumey(ctx):
 	voice = utils.get(client.voice_clients,guild=ctx.guild)
 	if voice and voice.is_paused():
@@ -143,7 +143,8 @@ async def resumey(ctx):
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
 
-@client.command()
+
+@client.command(name = 'stopy', help = 'Удалить текущий трек')
 async def stopy(ctx):
 	voice = utils.get(client.voice_clients,guild=ctx.guild)
 	if voice and voice.is_playing():
