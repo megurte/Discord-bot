@@ -297,13 +297,9 @@ async def skipy(ctx):
 
 
 
-
-
-
 @client.command(aliases = ['adder', 'addition', 'summ'],name = 'sum, adder, summ', help = 'Сложить два числа X Y')
 async def _summ(ctx, arg1, arg2):
 	await ctx.send(int(arg1)+int(arg2))
-
 
 
 
