@@ -1,5 +1,7 @@
 import discord
 import youtube_dl
+import os
+import shutil
 
 from discord import utils
 from discord import FFmpegPCMAudio
@@ -18,7 +20,9 @@ POST_ID = 779692750941323264
 play_emoji =str("▶️")
 pause_emoji= str("⏸️")
 resume_emoji = str("🔃")
-stop_emoji = str("⏹️")
+stop_emoji = str("⏹")
+skip_emoji = str("⏭️")
+check_emoji = str("☑️")
 
 ROLES = {
 	'🥐': 276393911771987968, #Чебурек
@@ -100,23 +104,155 @@ async def leave(ctx):
 	
 
 #youtube music commands
-@client.command(aliases = ['pyou', 'py', 'playyoutube'],name = 'pyou, py, playyoutube', help = 'Запустить проигрывание ютуб видео по ссылке')
-async def pyou(ctx, url):
-	FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-	voice = utils.get(client.voice_clients, guild=ctx.guild)
-	#message = await channel.fetch_message(ctx.message_id)
+@client.command(aliases = ['pyou', 'py', 'playy'],name = 'playy, py, pyou', help = 'Запустить ютуб видео по ссылке')
+async def playy(ctx, url: str):
+	def check_queue():
+		Queue_infile = os.path.isdir("./Queue")
+		if Queue_infile is True:
+			DIR = os.path.abspath(os.path.realpath("Queue"))
+			length = len(os.listdir(DIR))
+			still_q = length - 1
+			try:
+				first_file = os.listdir(DIR)[0]
+			except:
+				print("No more queued song(s)\n")
+				queues.clear()
+				return
+			main_location = os.path.dirname(os.path.realpath(__file__))
+			song_path = os.path.abspath(os.path.realpath("Queue") + "\\" + first_file)
+			if length != 0:
+				print("Song done, playing next queued\n")
+				print(f"Songs still in queue: {still_q}")
+				song_there = os.path.isfile("song.mp3")
+				if song_there:
+					os.remove("song.mp3")
+				shutil.move(song_path, main_location)
+				for file in os.listdir("./"):
+					if file.endswith(".mp3"):
+						os.rename(file, 'song.mp3')
 
-	if not voice.is_playing():
-		with YoutubeDL(ydl_opts) as ydl:
-			info = ydl.extract_info(url, download=False)
-		URL = info['formats'][0]['url']
-		voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-		voice.is_playing()
-		await ctx.message.add_reaction(play_emoji)
-	else:
-		await ctx.send("Музыка уже играет")
+				voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
+				voice.source = discord.PCMVolumeTransformer(voice.source)
+				voice.source.volume = 0.07
+
+			else:
+				queues.clear()
+				return
+
+		else:
+			queues.clear()
+			print("No songs were queued before the ending of the last song\n")
+
+	song_there = os.path.isfile("song.mp3")
+	try:
+		if song_there:
+			os.remove("song.mp3")
+			queues.clear()
+			print("Removed old song file")
+	except PermissionError:
+		print("Trying to delete song file, but it's being played")
+		await ctx.send("Ошибка, музыка уже играет")
 		return
 
+
+	Queue_infile = os.path.isdir("./Queue")
+	try:
+		Queue_folder = "./Queue"
+		if Queue_infile is True:
+			print("Removed old Queue Folder")
+			shutil.rmtree(Queue_folder)
+	except:
+		print("No old Queue folder")
+
+	#await ctx.send("Getting everything ready now")
+	await ctx.message.add_reaction(play_emoji)
+
+	voice = utils.get(client.voice_clients, guild=ctx.guild)
+
+	ydl_opts = {
+		'format': 'bestaudio/best',
+		'quiet': True,
+		'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			#'preferredquality': '192',
+		}],
+	}
+
+	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+		print("Downloading audio now\n")
+		ydl.download([url])
+
+	for file in os.listdir("./"):
+		if file.endswith(".mp3"):
+			name = file
+			print(f"Renamed File: {file}\n")
+			os.rename(file, "song.mp3")
+
+	voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
+	voice.source = discord.PCMVolumeTransformer(voice.source)
+	voice.source.volume = 0.07
+
+	nname = name.rsplit("-", 2)
+	await ctx.send(f"Играет: {nname[0]}")
+	print("playing\n")
+
+#	FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+#	voice = utils.get(client.voice_clients, guild=ctx.guild)
+
+#	if not voice.is_playing():
+#		with YoutubeDL(ydl_opts) as ydl:
+#			info = ydl.extract_info(url, download=False)
+#		URL = info['formats'][0]['url']
+#		voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+#		voice.is_playing()
+#		await ctx.message.add_reaction(play_emoji)
+#	else:
+#		await ctx.send("Музыка уже играет")
+#		return
+
+#
+queues = {}
+
+@client.command(pass_context=True, aliases=['qy', 'quey'])
+async def queuey(ctx, url: str):
+	Queue_infile = os.path.isdir("./Queue")
+	if Queue_infile is False:
+		os.mkdir("Queue")
+	DIR = os.path.abspath(os.path.realpath("Queue"))
+	q_num = len(os.listdir(DIR))
+	q_num += 1
+	add_queue = True
+	while add_queue:
+		if q_num in queues:
+			q_num += 1
+		else:
+			add_queue = False
+			queues[q_num] = q_num
+
+	queue_path = os.path.abspath(os.path.realpath("Queue") + f"\song{q_num}.%(ext)s")
+
+	ydl_opts = {
+		'format': 'bestaudio/best',
+		'quiet': True,
+		'outtmpl': queue_path,
+		'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			#'preferredquality': '192',
+		}],
+	}
+
+	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+		print("Downloading audio now\n")
+		ydl.download([url])
+	await ctx.message.add_reaction(check_emoji)
+	await ctx.send("Добавлено " + str(q_num) + " в очередь")
+
+	print("Song added to queue\n")
+
+
+#
 
 @client.command(name = 'pausey', help = 'Остановить проигрывание трека')
 async def pausey(ctx):
@@ -124,11 +260,12 @@ async def pausey(ctx):
 	if voice and voice.is_playing():
 		print("Bot is playing")
 		voice.pause()
-		#await ctx.send("⏸️")
+		#await ctx.("⏸️")
 		await ctx.message.add_reaction(pause_emoji)
 	else:
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
+
 
 
 @client.command(name = 'resumey', help = 'Возобновить проигрывание трека')
@@ -143,31 +280,21 @@ async def resumey(ctx):
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
 
-
-@client.command(name = 'stopy', help = 'Удалить текущий трек')
-async def stopy(ctx):
+#youtube music skip
+@client.command(name = 'skipy', help = 'Пропустить текущий трек')
+async def skipy(ctx):
 	voice = utils.get(client.voice_clients,guild=ctx.guild)
 	if voice and voice.is_playing():
-		print("Music stopped")
+		print("Skip music")
 		voice.stop()
 		#await ctx.send("⏹️")
-		await ctx.message.add_reaction(stop_emoji)
+		await ctx.message.add_reaction(skip_emoji)
 	else:
 		print("Nothing is playing")
 		await ctx.send("Ошибка, нет текущей песни")
 
 
-#youtube music skip
-@client.command()
-async def skipy(ctx):
-	voice = utils.get(client.voice_clients,guild=ctx.guild)
-	if voice and voice.is_playing() or voice.is_paused():
-		print("Skip music")
-		#voice.resume
-		await ctx.send("⏭️")
-	else:
-		print("Nothing is playing")
-		await ctx.send("Ошибка, что-то пошло не так")
+
 
 
 
