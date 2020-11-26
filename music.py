@@ -105,7 +105,7 @@ async def leave(ctx):
 	
 
 #youtube music commands
-@client.command(aliases = ['pyou', 'py', 'playy'],name = 'playy, py, pyou', help = 'Запустить ютуб видео по ссылке')
+@client.command(pass_context=True, aliases = ['pyou', 'py', 'playy'],name = 'playy, py, pyou', help = 'Запустить ютуб видео по ссылке')
 async def playy(ctx, url: str):
 	def check_queue():
 		Queue_infile = os.path.isdir("./Queue")
@@ -155,7 +155,6 @@ async def playy(ctx, url: str):
 		await ctx.send("Ошибка, музыка уже играет")
 		return
 
-
 	Queue_infile = os.path.isdir("./Queue")
 	try:
 		Queue_folder = "./Queue"
@@ -165,8 +164,8 @@ async def playy(ctx, url: str):
 	except:
 		print("No old Queue folder")
 
-	#await ctx.send("Getting everything ready now")
 	await ctx.message.add_reaction(play_emoji)
+	#await ctx.send("Getting everything ready now")
 
 	voice = utils.get(client.voice_clients, guild=ctx.guild)
 
@@ -176,7 +175,7 @@ async def playy(ctx, url: str):
 		'postprocessors': [{
 			'key': 'FFmpegExtractAudio',
 			'preferredcodec': 'mp3',
-			#'preferredquality': '192',
+			'preferredquality': '192',
 		}],
 	}
 
@@ -197,6 +196,9 @@ async def playy(ctx, url: str):
 	nname = name.rsplit("-", 2)
 	await ctx.send(f"Играет: {nname[0]}")
 	print("playing\n")
+
+
+
 
 #	FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 #	voice = utils.get(client.voice_clients, guild=ctx.guild)
@@ -221,6 +223,7 @@ async def queuey(ctx, url: str):
 	if Queue_infile is False:
 		os.mkdir("Queue")
 	DIR = os.path.abspath(os.path.realpath("Queue"))
+	
 	q_num = len(os.listdir(DIR))
 	q_num += 1
 	add_queue = True
@@ -253,7 +256,7 @@ async def queuey(ctx, url: str):
 	print("Song added to queue\n")
 
 
-#
+
 
 @client.command(name = 'pausey', help = 'Остановить проигрывание трека')
 async def pausey(ctx):
