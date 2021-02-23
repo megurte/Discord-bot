@@ -214,7 +214,7 @@ async def playy(ctx, url: str):
 #		await ctx.send("Музыка уже играет")
 #		return
 
-#
+
 queues = {}
 
 @client.command(pass_context=True, aliases=['qy', 'quey'], help = "Добавить песню в очередь")
@@ -386,7 +386,7 @@ async def on_message(message):
  #   if isinstance(error, CheckFailure):
  #       await ctx.send("Извините, вы не можите использовать эту команду. Необходимо иметь права администратора")
 
-client.run('Nzc5NDUzOTEyMzE0OTM3Mzg0.X7gxBg.bJgS45rEljUU_GXGXKnjpctoKR8')
+client.run('TOKEN')
 
 
 
