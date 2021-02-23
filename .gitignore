@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 
 *.mp3
+#ignore temp audio files
+**.mp3 
+**.webm 
+>>>>>>> 3377d62b9d6c452cdf9b5ebb137cf23da71f3fba

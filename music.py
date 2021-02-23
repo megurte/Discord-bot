@@ -188,6 +188,8 @@ async def playy(ctx, url: str):
 			name = file
 			print(f"Renamed File: {file}\n")
 			os.rename(file, "song.mp3")
+		else:
+			break
 
 	voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
 	voice.source = discord.PCMVolumeTransformer(voice.source)
@@ -217,7 +219,7 @@ async def playy(ctx, url: str):
 
 queues = {}
 
-@client.command(pass_context=True, aliases=['qy', 'quey'], help = "Добавить песню в очередь")
+@client.command(aliases=['qy', 'quey'], help = "Добавить песню в очередь")
 async def queuey(ctx, url: str):
 	Queue_infile = os.path.isdir("./Queue")
 	if Queue_infile is False:
@@ -256,6 +258,16 @@ async def queuey(ctx, url: str):
 	print("Song added to queue\n")
 
 
+<<<<<<< HEAD
+=======
+@client.command(aliases=['qyl', 'qylist'],name = qylist, help = "Добавить песню в очередь")
+async def queueylist(ctx, queuelist):
+	queuelist = queues
+	for i in range(len(A))
+		print()
+	print("end")
+
+>>>>>>> 3377d62b9d6c452cdf9b5ebb137cf23da71f3fba
 
 
 @client.command(name = 'pausey', help = 'Остановить проигрывание трека')
