@@ -16,7 +16,6 @@ from random import choice
 
 client = commands.Bot(command_prefix='!')
 POST_ID = 779692750941323264
-VERSION = str ("1.1 ©Megurt")
 
 play_emoji =str("▶️")
 pause_emoji= str("⏸️")
@@ -219,7 +218,11 @@ async def playy(ctx, url: str):
 
 queues = {}
 
+<<<<<<< HEAD
 @client.command(aliases=['qy', 'quey'], help = "Добавить песню в очередь")
+=======
+@client.command(pass_context=True, aliases=['qy', 'quey'])
+>>>>>>> parent of 54819e5 (Update music.py)
 async def queuey(ctx, url: str):
 	Queue_infile = os.path.isdir("./Queue")
 	if Queue_infile is False:
