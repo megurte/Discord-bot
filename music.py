@@ -398,7 +398,7 @@ async def on_message(message):
  #   if isinstance(error, CheckFailure):
  #       await ctx.send("Извините, вы не можите использовать эту команду. Необходимо иметь права администратора")
 
-client.run('TOKEN')
+client.run('')
 
 
 
